@@ -1,9 +1,10 @@
-version: 1.0
+version: 1
 Resources:
   - TargetService:
       Type: AWS::ECS::Service
       Properties:
-        TaskDefinition: "<TASK_DEFINITION>"
+        TaskDefinition: "taskdef.json"
         LoadBalancerInfo:
-          ContainerName: "web"
+          ContainerName: "fe-chatbot"
           ContainerPort: 3000
+        PlatformVersion: "1.4.0"

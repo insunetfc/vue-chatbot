@@ -1,0 +1,27 @@
+{
+  "family": "fe-chatbot-taskdef",
+  "networkMode": "awsvpc",
+  "executionRoleArn": "arn:aws:iam::448091852876:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::448091852876:role/myappTaskRole",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "containerDefinitions": [
+    {
+      "name": "myapp",
+      "image": "448091852876.dkr.ecr.ap-northeast-2.amazonaws.com/throw/fe-chatbot",
+      "portMappings": [{ "containerPort": 3000, "protocol": "tcp" }],
+      "essential": true,
+      "environment": [{ "name": "NODE_ENV", "value": "production" }],
+      "secrets": [],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "throw/fe-chatbot",
+          "awslogs-region": "ap-northeast-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}

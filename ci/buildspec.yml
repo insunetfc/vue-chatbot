@@ -5,7 +5,7 @@ env:
     AWS_DEFAULT_REGION: ap-northeast-2
     IMAGE_REPO_URI: 448091852876.dkr.ecr.ap-northeast-2.amazonaws.com/throw/fe-chatbot
     CONTAINER_NAME: fe-chatbot
-    DOCKER_CONTEXT_PATH: ./app
+    DOCKER_CONTEXT_PATH: .
 
 phases:
   pre_build:

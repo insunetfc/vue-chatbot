@@ -17,6 +17,8 @@ RUN bun run build    # 프론트엔드 빌드 혹은 백엔드 빌드 스크립�
 # 최종 이미지
 FROM base AS release
 WORKDIR /usr/src/app
+RUN ls -R /usr/src/app 
+RUN pwd
 COPY --from=build /usr/src/app ./    # 빌드된 파일 및 필요 파일 복사
 # production 의존성만 다시 설치 (선택사항)
 RUN rm -rf node_modules \

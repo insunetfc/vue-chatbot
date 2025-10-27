@@ -1,23 +1,32 @@
 {
-  "family": "fe-chatbot-taskdef",
-  "networkMode": "awsvpc",
-  "executionRoleArn": "arn:aws:iam::448091852876:role/ecsTaskExecutionRole",
-  "taskRoleArn": "arn:aws:iam::448091852876:role/myappTaskRole",
+  "family": "fe-chatbot-family",
   "requiresCompatibilities": ["FARGATE"],
+  "networkMode": "awsvpc",
   "cpu": "512",
   "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::448091852876:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::448091852876:role/fe-chatbotTaskRole",
   "containerDefinitions": [
     {
-      "name": "myapp",
-      "image": "448091852876.dkr.ecr.ap-northeast-2.amazonaws.com/throw/fe-chatbot",
-      "portMappings": [{ "containerPort": 3000, "protocol": "tcp" }],
+      "name": "fe-chatbot",
+      "image": "448091852876.dkr.ecr.ap-northeast-2.amazonaws.com/throw/fe-chatbot:PLACEHOLDER_TAG",
+      "portMappings": [
+        {
+          "containerPort": 80,
+          "protocol": "tcp"
+        }
+      ],
       "essential": true,
-      "environment": [{ "name": "NODE_ENV", "value": "production" }],
-      "secrets": [],
+      "environment": [
+        {
+          "name": "NODE_ENV",
+          "value": "production"
+        }
+      ],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "throw/fe-chatbot",
+          "awslogs-group": "/ecs/fe-chatbot",
           "awslogs-region": "ap-northeast-2",
           "awslogs-stream-prefix": "ecs"
         }

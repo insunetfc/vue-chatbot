@@ -5,7 +5,7 @@ env:
     AWS_DEFAULT_REGION: ap-northeast-2
     IMAGE_REPO_URI: 448091852876.dkr.ecr.ap-northeast-2.amazonaws.com/throw/fe-chatbot
     CONTAINER_NAME: fe-chatbot
-    DOCKER_CONTEXT_PATH: . # Dockerfile이 하위 폴더면 경로 수정 (예: ./app)
+    DOCKER_CONTEXT_PATH: ./app
 phases:
   pre_build:
     commands:
@@ -23,10 +23,8 @@ phases:
       - echo "Push docker image to ECR"
       - docker push $IMAGE_REPO_URI:$GIT_SHA
       - docker push $IMAGE_REPO_URI:latest
-      - echo "Prepare taskdef.json with new image"
-      # ci/taskdef.json 템플릿에 <IMAGE_URI> 토큰이 있다고 가정
-      - sed -e "s|<IMAGE_URI>|$IMAGE_REPO_URI:$GIT_SHA|g" ci/taskdef.json > taskdef.json
+      - echo "Write imagedefinitions.json for ECS"
+      - printf '[{"name":"%s","imageUri":"%s:%s"}]\n' "$CONTAINER_NAME" "$IMAGE_REPO_URI" "$GIT_SHA" > imagedefinitions.json
 artifacts:
   files:
-    - taskdef.json
-    - ci/appspec.yaml
+    - imagedefinitions.json

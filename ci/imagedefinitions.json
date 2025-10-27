@@ -1,6 +1,6 @@
 [
   {
-    "name": "web",
+    "name": "fe-chatbot",
     "imageUri": "448091852876.dkr.ecr.ap-northeast-2.amazonaws.com/throw/fe-chatbot:latest"
   }
 ]

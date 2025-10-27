@@ -5,26 +5,30 @@ env:
     AWS_DEFAULT_REGION: ap-northeast-2
     IMAGE_REPO_URI: 448091852876.dkr.ecr.ap-northeast-2.amazonaws.com/throw/fe-chatbot
     CONTAINER_NAME: fe-chatbot
-    DOCKER_CONTEXT_PATH: ./app
+    DOCKER_CONTEXT_PATH: ./app # Dockerfile 위치가 app 폴더이면 이 값 유지
+
 phases:
   pre_build:
     commands:
-      - echo "Login to ECR"
+      - echo "Logging in to Amazon ECR..."
       - aws --version
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $(echo $IMAGE_REPO_URI | cut -d'/' -f1)
       - GIT_SHA=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c1-7)
-      - echo "Commit tag: $GIT_SHA"
+      - echo "Git SHA tag: $GIT_SHA"
+
   build:
     commands:
-      - echo "Build docker image"
+      - echo "Building the Docker image..."
       - docker build -t $IMAGE_REPO_URI:latest -t $IMAGE_REPO_URI:$GIT_SHA $DOCKER_CONTEXT_PATH
+
   post_build:
     commands:
-      - echo "Push docker image to ECR"
+      - echo "Pushing the Docker image to ECR..."
       - docker push $IMAGE_REPO_URI:$GIT_SHA
       - docker push $IMAGE_REPO_URI:latest
-      - echo "Write imagedefinitions.json for ECS"
+      - echo "Creating imagedefinitions.json for ECS..."
       - printf '[{"name":"%s","imageUri":"%s:%s"}]\n' "$CONTAINER_NAME" "$IMAGE_REPO_URI" "$GIT_SHA" > imagedefinitions.json
+
 artifacts:
   files:
     - imagedefinitions.json

@@ -2,9 +2,8 @@ version: 0.2
 
 env:
   variables:
-    IMAGE_REPO_NAME: fe-chatbot
-    AWS_REGION: ap-northeast-2
-    CONTAINER_NAME: web
+    IMAGE_REPO_NAME: "fe-chatbot"
+    CONTAINER_NAME: throw
   exported-variables:
     - IMAGE_TAG
 

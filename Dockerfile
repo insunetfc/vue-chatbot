@@ -2,9 +2,9 @@
 FROM oven/bun:latest AS base
 WORKDIR /usr/src/app
 
-# 의존성 설치 단계: 캐싱을 위해 먼저 package.json + bun.lockb 복사
+# 의존성 설치 단계: 캐싱을 위해 먼저 package.json + bun.lock 복사
 FROM base AS deps
-COPY package.json bun.lockb ./
+COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
 # 앱 복사 및 빌드 단계

@@ -1,32 +1,22 @@
-# 베이스 이미지로 공식 Bun 사용
-FROM oven/bun:latest AS base
-WORKDIR /usr/src/app
-
-# 의존성 설치 단계: 캐싱을 위해 먼저 package.json + bun.lock 복사
-FROM base AS deps
-COPY package.json bun.lock ./
+# 1) Bun으로 정적 자산 빌드를 수행
+FROM oven/bun:latest AS build
+WORKDIR /app
+COPY package.json bun.lock* ./
 RUN bun install --frozen-lockfile
-
-# 앱 복사 및 빌드 단계
-FROM base AS build
-COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY . .
-ENV NODE_ENV=production
-# 프론트엔드 빌드 혹은 백엔드 빌드 스크립트 실행
 RUN bun run build
 
-# 최종 이미지
-FROM base AS release
-WORKDIR /usr/src/app
-RUN ls -R /usr/src/app 
-RUN pwd
+# 2) Nginx를 최종 런타임으로 사용
+FROM nginx:1.25-alpine AS runtime
+WORKDIR /usr/share/nginx/html
+RUN rm -rf ./*
 
-# 빌드된 파일 및 필요 파일 복사
-COPY --from=build /usr/src/app ./
-# production 의존성만 다시 설치 (선택사항)
-RUN rm -rf node_modules \
-    && bun install --frozen-lockfile --production
-EXPOSE 3000
+# 커스텀 Nginx 설정 및 SSL 자산 반영
+COPY ci/nginx.conf /etc/nginx/nginx.conf
+COPY ci/ssl /etc/nginx/ssl
 
-# entry point 수정 필요할 수 있음
-CMD ["bun", "run", "start"]
+# 빌드 결과를 Nginx 정적 루트에 복사
+COPY --from=build /app/dist ./
+
+EXPOSE 80 443
+CMD ["nginx", "-g", "daemon off;"]

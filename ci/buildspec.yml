@@ -6,6 +6,8 @@ env:
     IMAGE_REPO_URI: 448091852876.dkr.ecr.ap-northeast-2.amazonaws.com/throw/fe-chatbot
     CONTAINER_NAME: fe-chatbot
     DOCKER_CONTEXT_PATH: .
+  exported-variables:
+    - GIT_SHA
 
 phases:
   pre_build:
@@ -15,7 +17,7 @@ phases:
       - |
         aws ecr get-login-password --region $AWS_DEFAULT_REGION \
         | docker login --username AWS --password-stdin $(echo $IMAGE_REPO_URI | cut -d'/' -f1)
-      - GIT_SHA=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c1-7)
+      - export GIT_SHA=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c1-7)
       - "echo Git SHA tag: $GIT_SHA"
 
   build:

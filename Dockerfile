@@ -1,10 +1,10 @@
-# 1) Bun으로 정적 자산 빌드를 수행
-FROM oven/bun:latest AS build
+# 1) Node 환경에서 Vue 정적 자산 빌드
+FROM node:22-alpine AS build
 WORKDIR /app
-COPY package.json bun.lock* ./
-RUN bun install --frozen-lockfile
+COPY package*.json ./
+RUN npm ci
 COPY . .
-RUN bun run build
+RUN npm run build
 
 # 2) Nginx를 최종 런타임으로 사용
 FROM nginx:1.25-alpine AS runtime

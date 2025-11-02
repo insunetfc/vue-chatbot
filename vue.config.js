@@ -1,6 +1,4 @@
 // vue.config.js
-const { defineConfig } = require("@vue/cli-service");
-const webpack = require("webpack");
 const fs = require('fs');
 const path = require('path');
 const { defineConfig } = require('@vue/cli-service');

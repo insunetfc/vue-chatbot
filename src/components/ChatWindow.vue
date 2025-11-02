@@ -204,6 +204,13 @@
               style="display: none"
               @change="onAvatarSelected"
             />
+            <input
+              ref="avatarInput"
+              type="file"
+              accept="image/*"
+              style="display: none"
+              @change="onAvatarSelected"
+            />
           </div>
         </header>
 

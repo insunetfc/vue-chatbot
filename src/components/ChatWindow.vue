@@ -127,6 +127,13 @@
     @clear="onHistoryClear"
   />
 
+  <web-builder
+    v-if="showWebBuilder"
+    :files="webBuilderData.files"
+    :initial-content="webBuilderData.content"
+    @close="showWebBuilder = false"
+  />
+
   <!-- ✅ 설정 드로어: 오른쪽 → 왼쪽 슬라이드 (Vulk 톤) -->
   <Transition
     enter-active-class="transition-opacity duration-200"
@@ -379,6 +386,81 @@
       </div>
     </div>
   </Transition>
+
+  <Transition
+    name="aa-slide"
+    enter-active-class="transition-opacity duration-200"
+    enter-from-class="opacity-0"
+    enter-to-class="opacity-100"
+    leave-active-class="transition-opacity duration-150"
+    leave-from-class="opacity-100"
+    leave-to-class="opacity-0"
+  >
+    <div
+      v-if="showBuilderList"
+      class="aa-modal-backdrop fixed inset-0 z-[3001] flex justify-end bg-slate-900/40"
+      @click.self="closeBuilderList"
+      role="presentation"
+    >
+      <div
+        class="flex h-full w-full max-w-[520px] flex-col overflow-y-auto rounded-l-2xl bg-white shadow-2xl transition-transform duration-300 ease-out"
+        :class="drawerOpen ? 'translate-x-0' : 'translate-x-full'"
+        ref="drawer"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="builderDrawer"
+      >
+        <header
+          class="pb-3 text-white bg-gradient-to-br from-indigo-500 to-violet-600"
+        >
+          <div class="flex items-center justify-between px-4 pt-3 pb-1">
+            <button
+              type="button"
+              class="icon-btn"
+              aria-label="닫기"
+              @click="closeBuilderList"
+            >
+              ←
+            </button>
+            <h2 id="builderDrawer" class="drawer-title">최근 웹빌더</h2>
+            <span class="icon-btn-spacer" aria-hidden="true"></span>
+          </div>
+        </header>
+        <section class="flex-1 px-4 pt-5 pb-32 space-y-5 text-slate-800">
+          <div v-if="!builderSessions.length" class="hint">
+            최근 웹빌더 세션이 없습니다.
+          </div>
+          <ul v-else class="builder-list">
+            <li v-for="s in builderSessions" :key="s.id" class="builder-item">
+              <div class="builder-meta">
+                <div class="builder-title" :title="s.title">{{ s.title }}</div>
+                <small class="builder-time">{{
+                  new Date(s.createdAt).toLocaleString()
+                }}</small>
+              </div>
+              <div class="builder-actions-row">
+                <button class="btn-mini" @click="openBuilderFromSession(s.id)">
+                  열기
+                </button>
+                <button
+                  class="btn-mini ghost"
+                  @click="duplicateBuilderSession(s.id)"
+                >
+                  복제
+                </button>
+                <button
+                  class="btn-mini danger"
+                  @click="deleteBuilderSession(s.id)"
+                >
+                  삭제
+                </button>
+              </div>
+            </li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </Transition>
 </template>
 
 <script setup>
@@ -403,6 +485,7 @@ import { createChatHistoryState } from "@/composables/useChatHistoryPanel";
 import { useUserStore } from "@/stores/userStore";
 import { useChatStore } from "@/stores/chatStore";
 import AnalysisSheet from "./sheet/AnalysisSheet.vue";
+import WebBuilder from "./builder/WebBuilder.vue";
 
 const historyUtils = useChatHistory();
 
@@ -483,7 +566,13 @@ const divisionField = ref(null);
 const jobField = ref(null);
 const avatarInput = ref(null);
 const drawerOpen = ref(false);
+const showWebBuilder = ref(false);
+const showBuilderList = ref(false);
 const composerHeight = ref(65);
+const webBuilderData = ref({
+  files: [],
+  content: "", // 빌더 본문 초기값
+});
 
 const md = new MarkdownIt({
   html: false,
@@ -1262,7 +1351,10 @@ async function sendMessage() {
   }
 }
 
-function openBuilderList() {}
+function openBuilderList() {
+  showBuilderList.value = !showBuilderList.value;
+}
+
 function openBuilderFromSession() {}
 function duplicateBuilderSession() {}
 

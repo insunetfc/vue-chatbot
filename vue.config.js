@@ -56,4 +56,17 @@ module.exports = defineConfig({
       }),
     ],
   },
+
+  devServer: {
+    host: "0.0.0.0",
+    port: 8080,
+    proxy: {
+      "/api/v_1": {
+        target: "http://15.165.60.45:5000",
+        changeOrigin: true,
+        secure: false,
+        pathRewrite: { "^/api/v_1": "" },
+      },
+    },
+  },
 });

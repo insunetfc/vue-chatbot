@@ -1,18 +1,57 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import BuildPublicPage from '@/pages/BuildPublicPage.vue' // 경로는 프로젝트 구조에 맞게
+import { createRouter, createWebHistory } from 'vue-router';
+import { hasValidAccessToken, loadAuthSession } from '@/utils/authStorage';
 
 const routes = [
-  // ...기존 라우트
   {
-    path: '/preview',
-    name: 'Preview',
-    component: BuildPublicPage
-  }
-]
+    path: '/',
+    redirect: '/chat',
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: () => import('@/views/Login.vue'),
+    meta: { requiresGuest: true },
+  },
+  {
+    path: '/auth/google/callback',
+    name: 'GoogleCallback',
+    component: () => import('@/views/GoogleCallback.vue'),
+    meta: { requiresGuest: true },
+  },
+  {
+    path: '/chat',
+    name: 'Chat',
+    component: () => import('@/views/Chat.vue'),
+    meta: { requiresAuth: true },
+  },
+];
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
-})
+  routes,
+});
 
-export default router
+router.beforeEach((to, _from, next) => {
+  const session = loadAuthSession();
+  const isAuthenticated = hasValidAccessToken(session);
+
+  if (to.meta?.requiresAuth && !isAuthenticated) {
+    const redirect = {
+      name: 'Login',
+      ...(to.fullPath && to.fullPath !== '/login'
+        ? { query: { redirect: to.fullPath } }
+        : {}),
+    };
+    next(redirect);
+    return;
+  }
+
+  if (to.meta?.requiresGuest && isAuthenticated) {
+    next({ name: 'Chat' });
+    return;
+  }
+
+  next();
+});
+
+export default router;

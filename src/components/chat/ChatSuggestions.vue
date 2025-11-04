@@ -155,17 +155,6 @@
               </button>
             </div>
           </div>
-          <footer
-            class="flex items-center justify-end gap-3 px-5 py-4 border-t border-slate-100"
-          >
-            <button
-              type="button"
-              class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold transition border rounded-xl border-slate-200 text-slate-600 hover:border-slate-300 hover:text-slate-700"
-              @click="closeModal"
-            >
-              닫기
-            </button>
-          </footer>
         </div>
       </div>
     </Transition>

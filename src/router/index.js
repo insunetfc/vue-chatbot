@@ -9,13 +9,13 @@ const routes = [
   {
     path: '/login',
     name: 'Login',
-    component: () => import('@/views/Login.vue'),
+    component: () => import('@/views/login/Login.vue'),
     meta: { requiresGuest: true },
   },
   {
     path: '/auth/google/callback',
     name: 'GoogleCallback',
-    component: () => import('@/views/GoogleCallback.vue'),
+    component: () => import('@/views/login/GoogleCallback.vue'),
     meta: { requiresGuest: true },
   },
   {

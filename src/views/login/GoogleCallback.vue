@@ -1,7 +1,7 @@
 <template>
-  <div class="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-6 py-12">
-    <div class="w-full max-w-md rounded-3xl bg-white px-10 py-12 text-center shadow-2xl shadow-indigo-100/80">
-      <div class="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-100 text-indigo-500">
+  <div class="flex flex-col items-center justify-center min-h-screen px-6 py-12 bg-slate-50">
+    <div class="w-full max-w-md px-10 py-12 text-center bg-white shadow-2xl rounded-3xl shadow-indigo-100/80">
+      <div class="flex items-center justify-center mx-auto mb-6 text-indigo-500 bg-indigo-100 rounded-full h-14 w-14">
         <svg class="h-7 w-7 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
@@ -10,11 +10,11 @@
       <h1 class="text-xl font-semibold text-slate-900">Google 로그인 처리 중...</h1>
       <p class="mt-2 text-sm text-slate-500" v-if="status === 'loading'">잠시만 기다려 주세요.</p>
 
-      <div v-if="status === 'error'" class="mt-6 rounded-xl bg-rose-50 px-4 py-3 text-left text-sm text-rose-600">
+      <div v-if="status === 'error'" class="px-4 py-3 mt-6 text-sm text-left rounded-xl bg-rose-50 text-rose-600">
         {{ message }}
       </div>
 
-      <div v-if="status === 'success'" class="mt-6 rounded-xl bg-emerald-50 px-4 py-3 text-left text-sm text-emerald-600">
+      <div v-if="status === 'success'" class="px-4 py-3 mt-6 text-sm text-left rounded-xl bg-emerald-50 text-emerald-600">
         로그인에 성공했습니다. 곧 이동합니다...
       </div>
     </div>

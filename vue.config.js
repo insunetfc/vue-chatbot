@@ -1,15 +1,13 @@
 // vue.config.js
+const fs = require("fs");
+const path = require("path");
 const { defineConfig } = require("@vue/cli-service");
 const webpack = require("webpack");
-const fs = require('fs');
-const path = require('path');
-const { defineConfig } = require('@vue/cli-service');
-const webpack = require('webpack');
-const dotenv = require('dotenv');
-const dotenvExpand = require('dotenv-expand');
+const dotenv = require("dotenv");
+const dotenvExpand = require("dotenv-expand");
 
 function loadEnvFiles() {
-  const envFiles = ['.env.local', '.env'];
+  const envFiles = [".env.local", ".env"];
   return envFiles.reduce((acc, file) => {
     const filePath = path.resolve(__dirname, file);
     if (!fs.existsSync(filePath)) {
@@ -35,7 +33,7 @@ function loadEnvFiles() {
 function createEnvDefinitions() {
   const loadedEnv = loadEnvFiles();
   const entries = Object.entries(loadedEnv).filter(([key]) =>
-    key.startsWith('VUE_APP_')
+    key.startsWith("VUE_APP_")
   );
 
   return entries.reduce((definitions, [key, value]) => {

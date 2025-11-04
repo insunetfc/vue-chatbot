@@ -7,7 +7,7 @@
   >
     <button
       type="button"
-      class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:bg-slate-50 disabled:opacity-40"
+      class="inline-flex items-center justify-center w-10 h-10 transition bg-white border rounded-full shadow-sm border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-40"
       :disabled="isSending"
       @click.stop="togglePicker"
       aria-label="파일 업로드"
@@ -33,10 +33,18 @@
       v-click-outside="closePicker"
       @click.stop
     >
-      <button type="button" class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-100" @click="openPicker('docs')">
+      <button
+        type="button"
+        class="flex items-center w-full gap-2 px-3 py-2 text-sm transition rounded-lg text-slate-600 hover:bg-slate-100"
+        @click="openPicker('docs')"
+      >
         📄 문서 업로드
       </button>
-      <button type="button" class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-100" @click="openPicker('images')">
+      <button
+        type="button"
+        class="flex items-center w-full gap-2 px-3 py-2 text-sm transition rounded-lg text-slate-600 hover:bg-slate-100"
+        @click="openPicker('images')"
+      >
         🖼 사진 업로드
       </button>
     </div>
@@ -60,7 +68,7 @@
 
     <textarea
       ref="textarea"
-      class="h-10 w-full resize-none rounded-xl border border-transparent bg-slate-100 px-3 py-2 text-sm text-slate-700 outline-none ring-0 transition focus:border-indigo-300 focus:bg-white focus:shadow-inner focus:ring-2 focus:ring-indigo-200"
+      class="flex-1 w-full px-3 py-2 text-sm transition border border-transparent outline-none resize-none min-h-10 rounded-xl bg-slate-100 text-slate-700 ring-0 focus:border-indigo-300 focus:bg-white focus:shadow-inner focus:ring-2 focus:ring-indigo-200"
       :value="modelValue"
       placeholder="무엇이든 물어보세요..."
       rows="1"
@@ -73,12 +81,18 @@
 
     <button
       type="button"
-      class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500 text-white shadow transition hover:bg-indigo-600 disabled:cursor-not-allowed disabled:bg-slate-300"
+      class="inline-flex items-center justify-center w-10 h-10 text-white transition bg-indigo-500 rounded-full shadow hover:bg-indigo-600 disabled:cursor-not-allowed disabled:bg-slate-300"
       :disabled="!canSend || isSending"
       aria-label="메시지 전송"
       @click="emit('send')"
     >
-      <svg viewBox="0 0 24 24" fill="white" width="18" height="18" aria-hidden="true">
+      <svg
+        viewBox="0 0 24 24"
+        fill="white"
+        width="18"
+        height="18"
+        aria-hidden="true"
+      >
         <path d="M2 21l21-9L2 3v7l15 2-15 2v7z" />
       </svg>
     </button>
@@ -86,12 +100,12 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick } from 'vue';
+import { ref, watch, nextTick } from "vue";
 
 const props = defineProps({
   modelValue: {
     type: String,
-    default: '',
+    default: "",
   },
   isSending: {
     type: Boolean,
@@ -108,12 +122,12 @@ const props = defineProps({
 });
 
 const emit = defineEmits([
-  'update:modelValue',
-  'send',
-  'files-selected',
-  'keydown',
-  'compositionstart',
-  'compositionend',
+  "update:modelValue",
+  "send",
+  "files-selected",
+  "keydown",
+  "compositionstart",
+  "compositionend",
 ]);
 
 const pickerOpen = ref(false);
@@ -130,30 +144,33 @@ const vClickOutside = {
       }
     };
     el.__clickOutside__ = handler;
-    document.addEventListener('click', handler);
+    document.addEventListener("click", handler);
   },
   unmounted(el) {
     if (el.__clickOutside__) {
-      document.removeEventListener('click', el.__clickOutside__);
+      document.removeEventListener("click", el.__clickOutside__);
     }
   },
 };
 
 function autoResize() {
   if (!textarea.value) return;
-  textarea.value.style.height = 'auto';
-  textarea.value.style.height = `${Math.min(textarea.value.scrollHeight, 200)}px`;
+  textarea.value.style.height = "auto";
+  textarea.value.style.height = `${Math.min(
+    textarea.value.scrollHeight,
+    200
+  )}px`;
 }
 
 watch(
   () => props.modelValue,
   () => nextTick(() => autoResize()),
-  { immediate: true },
+  { immediate: true }
 );
 
 function onInput(event) {
   const target = event.target;
-  emit('update:modelValue', target.value);
+  emit("update:modelValue", target.value);
   autoResize();
 }
 
@@ -167,16 +184,16 @@ function closePicker() {
 
 function openPicker(kind) {
   pickerOpen.value = false;
-  if (kind === 'images') imagesInput.value?.click();
+  if (kind === "images") imagesInput.value?.click();
   else docsInput.value?.click();
 }
 
 function onFilesSelected(event) {
   const target = event.target;
   if (!target.files || !target.files.length) return;
-  const kind = target === imagesInput.value ? 'images' : 'docs';
-  emit('files-selected', { files: Array.from(target.files), kind });
-  target.value = '';
+  const kind = target === imagesInput.value ? "images" : "docs";
+  emit("files-selected", { files: Array.from(target.files), kind });
+  target.value = "";
 }
 
 function focusTextarea() {

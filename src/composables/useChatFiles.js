@@ -1,3 +1,5 @@
+import { reactive, toRefs, nextTick } from "vue";
+
 export function createChatFileState() {
   return {
     uploadedFiles: [],
@@ -185,3 +187,71 @@ export const chatFileMethods = {
     this.handleSelectFiles(e.dataTransfer?.files || []);
   },
 };
+
+export function useChatFiles({
+  showError,
+  scrollToBottom,
+  limits = {},
+} = {}) {
+  const state = reactive(createChatFileState());
+
+  const config = {
+    get uploadedFiles() {
+      return state.uploadedFiles;
+    },
+    set uploadedFiles(val) {
+      state.uploadedFiles = Array.isArray(val) ? [...val] : [];
+    },
+    get previewURLs() {
+      return state.previewURLs;
+    },
+    set previewURLs(val) {
+      state.previewURLs = Array.isArray(val) ? [...val] : [];
+    },
+    get isDragOver() {
+      return state.isDragOver;
+    },
+    set isDragOver(val) {
+      state.isDragOver = !!val;
+    },
+    get isDraggingFile() {
+      return state.isDraggingFile;
+    },
+    set isDraggingFile(val) {
+      state.isDraggingFile = !!val;
+    },
+    get dragCounter() {
+      return state.dragCounter;
+    },
+    set dragCounter(val) {
+      state.dragCounter = Number.isFinite(val) ? val : 0;
+    },
+    get LIMIT_MAX_FILES() {
+      return Number.isFinite(limits.maxFiles) ? limits.maxFiles : Infinity;
+    },
+    get LIMIT_PER_FILE() {
+      return Number.isFinite(limits.perFile) ? limits.perFile : Infinity;
+    },
+    get LIMIT_TOTAL() {
+      return Number.isFinite(limits.total) ? limits.total : Infinity;
+    },
+    showError: (...args) => {
+      if (typeof showError === "function") showError(...args);
+    },
+    scrollToBottom: (...args) => {
+      if (typeof scrollToBottom === "function") scrollToBottom(...args);
+    },
+    $nextTick: nextTick,
+  };
+
+  const bound = {};
+  Object.entries(chatFileMethods).forEach(([key, method]) => {
+    bound[key] = (...args) => method.apply(config, args);
+  });
+  Object.assign(config, bound);
+
+  return {
+    ...toRefs(state),
+    ...bound,
+  };
+}

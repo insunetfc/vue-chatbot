@@ -5,10 +5,8 @@
     <div
       class="w-full max-w-md px-10 py-12 text-center bg-white shadow-2xl rounded-3xl shadow-indigo-100/80"
     >
-      <div
-        class="flex items-center justify-center w-16 h-16 mx-auto mb-6 text-3xl rounded-full bg-indigo-50"
-      >
-        🤖
+      <div class="flex items-center justify-center mx-auto mb-6 text-3xl">
+        <img src="/logo.png" alt="로고" class="w-auto h-12" />
       </div>
       <h1 class="text-2xl font-semibold text-slate-900">Chatbot에 로그인</h1>
       <p class="mt-2 text-sm text-slate-500">
@@ -86,7 +84,10 @@ function encodeState(payload) {
 }
 
 function base64UrlEncode(arrayBuffer) {
-  const bytes = arrayBuffer instanceof Uint8Array ? arrayBuffer : new Uint8Array(arrayBuffer);
+  const bytes =
+    arrayBuffer instanceof Uint8Array
+      ? arrayBuffer
+      : new Uint8Array(arrayBuffer);
   let binary = "";
   for (let i = 0; i < bytes.byteLength; i += 1) {
     binary += String.fromCharCode(bytes[i]);

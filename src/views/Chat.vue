@@ -5,10 +5,10 @@
 </template>
 
 <script>
-import ChatWindow from '@/components/ChatWindow.vue';
+import ChatWindow from "@/components/ChatWindow.vue";
 
 export default {
-  name: 'ChatView',
+  name: "ChatView",
   components: {
     ChatWindow,
   },

@@ -1,45 +1,106 @@
+export const SUGGESTED_PROMPTS_INITIAL = [
+  { title: "문서공유", desc: "고객 실시간 상담" },
+  { title: "보장분석", desc: "계약 보장 내용 분석" },
+  { title: "제안서작성", desc: "상황에 맞는추천 제안서 생성" },
+  { title: "고객질문답변", desc: "고객이 묻는 질문/보조 답변" },
+  { title: "안내문작성", desc: "후속 안내 문자·톡 발송" },
+  { title: "상담스크립트", desc: "방문·콜 상담 대본 생성" },
+  { title: "교육자료", desc: "상담·영업 교육자료 제작" },
+  { title: "마케팅콘텐츠", desc: "홍보·마케팅 글/이미지 제작" },
+  { title: "고객공략법", desc: "고객 유형별 공략 아이디어 제시" },
+  { title: "예상수수료", desc: "계약 예상 수수료 계산" },
+  { title: "보험금확인", desc: "보험금 수령 예상 금액" },
+  { title: "모바일쿠폰", desc: "고객 대상 선물 전송" },
+];
+
 export function createPromptState() {
   return {
     forceInitPrompts: false,
     initExpanded: false,
     isAwaitingFollowups: false,
     suggestedPrompts: [],
-    suggestedPromptsInitial: [
-      { title: "문서공유", desc: "고객 실시간 상담" },
-      { title: "보장분석", desc: "계약 보장 내용 분석" },
-      { title: "제안서작성", desc: "상황에 맞는추천 제안서 생성" },
-      { title: "고객질문답변", desc: "고객이 묻는 질문/보조 답변" },
-      { title: "안내문작성", desc: "후속 안내 문자·톡 발송" },
-      { title: "상담스크립트", desc: "방문·콜 상담 대본 생성" },
-      { title: "교육자료", desc: "상담·영업 교육자료 제작" },
-      { title: "마케팅콘텐츠", desc: "홍보·마케팅 글/이미지 제작" },
-      { title: "고객공략법", desc: "고객 유형별 공략 아이디어 제시" },
-      { title: "예상수수료", desc: "계약 예상 수수료 계산" },
-      { title: "보험금확인", desc: "보험금 수령 예상 금액" },
-      { title: "모바일쿠폰", desc: "고객 대상 선물 전송" },
-    ],
+    suggestedPromptsInitial: [...SUGGESTED_PROMPTS_INITIAL],
     lastClickedChipTitle: null,
   };
 }
 
+const EMOJI_MAP = {
+  문서공유: "📄",
+  보장분석: "🔍",
+  제안서작성: "✍️",
+  안내문작성: "📤",
+  교육자료: "👨‍🏫",
+  스케줄작성: "📅",
+  상담스크립트: "💬",
+  마케팅콘텐츠: "📢",
+  "FAQ·상담보조": "❓",
+  고객공략법: "📈",
+  예상수수료: "💰",
+  보험금확인: "🛡️",
+  모바일쿠폰: "🎁",
+  고객질문답변: "🧩",
+};
+
+const SHEET_PROP_MAP = {
+  analysis: "showAnalysisSheet",
+  proposal: "showProposalSheet",
+  qna: "showQnaSheet",
+  notice: "showNoticeSheet",
+  bonus: "showBonusSheet",
+  script: "showConsultScript",
+  edu: "showEduMaterial",
+  marketing: "showMarketingContent",
+  schedule: "showConsultSchedule",
+  strategy: "showCustomerStrategy",
+  claim: "showClaimCheck",
+};
+
+const PROMPT_ACTION_MAP = {
+  보장분석: { type: "open-sheet", sheet: "analysis" },
+  제안서작성: { type: "open-sheet", sheet: "proposal" },
+  고객질문답변: { type: "open-sheet", sheet: "qna" },
+  안내문작성: { type: "open-sheet", sheet: "notice" },
+  예상수수료: { type: "open-sheet", sheet: "bonus" },
+  상담스크립트: { type: "open-sheet", sheet: "script" },
+  교육자료: { type: "open-sheet", sheet: "edu" },
+  마케팅콘텐츠: { type: "open-sheet", sheet: "marketing" },
+  스케줄작성: { type: "open-sheet", sheet: "schedule" },
+  고객공략법: { type: "open-sheet", sheet: "strategy" },
+  보험금확인: { type: "open-sheet", sheet: "claim" },
+};
+
+export function promptEmojiIcon(title) {
+  return EMOJI_MAP[title] || "";
+}
+
+export function resolveInitPromptAction(prompt = {}) {
+  const title = (prompt?.title || "").trim();
+  if (!title) {
+    return { type: "none", title: "" };
+  }
+
+  const action = PROMPT_ACTION_MAP[title];
+  if (action) {
+    return { ...action, title };
+  }
+
+  const desc = typeof prompt?.desc === "string" ? prompt.desc.trim() : "";
+  const suggestion = [title, desc].filter(Boolean).join(" ").trim();
+
+  if (suggestion) {
+    return {
+      type: "apply-suggestion",
+      title,
+      suggestion,
+    };
+  }
+
+  return { type: "apply-suggestion", title, suggestion: title };
+}
+
 export const chatPromptMethods = {
   emojiIcon(title) {
-    const map = {
-      문서공유: "📄",
-      보장분석: "🔍",
-      제안서작성: "✍️",
-      안내문작성: "📤",
-      교육자료: "👨‍🏫",
-      스케줄작성: "📅",
-      상담스크립트: "💬",
-      마케팅콘텐츠: "📢",
-      "FAQ·상담보조": "❓",
-      고객공략법: "📈",
-      예상수수료: "💰",
-      보험금확인: "🛡️",
-      모바일쿠폰: "🎁",
-    };
-    return map[title] || "🧩";
+    return promptEmojiIcon(title);
   },
   onSuggestionSend(value) {
     this.applySuggestion(value, { send: true });
@@ -48,53 +109,24 @@ export const chatPromptMethods = {
     this.initExpanded = !this.initExpanded;
   },
   onInitChipClick(p) {
-    const title = (p?.title || "").trim();
-    this.lastClickedChipTitle = title;
-    if (title === "보장분석") {
-      this.showAnalysisSheet = true;
+    const action = resolveInitPromptAction(p);
+    if (action.title) {
+      this.lastClickedChipTitle = action.title;
+    }
+    if (action.type === "open-sheet" && action.sheet) {
+      const sheetProp = SHEET_PROP_MAP[action.sheet];
+      if (sheetProp && Object.prototype.hasOwnProperty.call(this, sheetProp)) {
+        this[sheetProp] = true;
+        return;
+      }
+    }
+    if (action.type === "apply-suggestion" && action.suggestion) {
+      this.applySuggestion(action.suggestion, { send: true });
       return;
     }
-    if (title === "제안서작성") {
-      this.ShowProposalSheet = true;
-      return;
+    if (action.title) {
+      this.applySuggestion(action.title, { send: true });
     }
-    if (title === "고객질문답변") {
-      this.showQnaSheet = true;
-      return;
-    }
-    if (title === "안내문작성") {
-      this.showNoticeSheet = true;
-      return;
-    }
-    if (title === "예상수수료") {
-      this.showBonusSheet = true;
-      return;
-    }
-    if (title === "상담스크립트") {
-      this.showConsultScript = true;
-      return;
-    }
-    if (title === "교육자료") {
-      this.showEduMaterial = true;
-      return;
-    }
-    if (title === "마케팅콘텐츠") {
-      this.showMarketingContent = true;
-      return;
-    }
-    if (title === "스케줄작성") {
-      this.showConsultSchedule = true;
-      return;
-    }
-    if (title === "고객공략법") {
-      this.showCustomerStrategy = true;
-      return;
-    }
-    if (title === "보험금확인") {
-      this.showClaimCheck = true;
-      return;
-    }
-    this.applySuggestion(`${p.title} ${p.desc}`, { send: true });
   },
   resetToInitPrompts() {
     this.suggestedPrompts = [];

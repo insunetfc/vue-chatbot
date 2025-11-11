@@ -4,62 +4,19 @@
       <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
         <!-- 헤더 -->
         <header class="sheet-header">
-          <h3 id="sheetTitle">예상 시상분석 — 자동계산</h3>
+          <h3 id="sheetTitle">예상수수료·시상분석 — 보험사/기준월별 자동계산</h3>
           <button type="button" class="sheet-close" aria-label="닫기" @click="$emit('close')">✕</button>
         </header>
 
         <!-- 바디 -->
         <section class="sheet-body">
-          <!-- ✅ [신규] 파일 드롭존 -->
-          <div
-            class="dropzone"
-            :class="{ over: isOver }"
-            @dragenter.prevent="onDragEnter"
-            @dragover.prevent="onDragOver"
-            @dragleave.prevent="onDragLeave"
-            @drop.prevent="onDrop"
-            @click="openDzPicker"
-            role="button"
-            tabindex="0"
-            @keydown.enter.prevent="openDzPicker"
-            @keydown.space.prevent="openDzPicker"
-          >
-            <div class="dz-icon">📎</div>
-            <div class="dz-title">시상 이미지를 드래그 또는 눌러 첨부하세요</div>
-            <div class="dz-hint">PDF, 이미지, 문서 등 여러 개 가능</div>
-
-            <!-- ✅ 미니 팝오버 선택 -->
-            <div v-if="dzPickerOpen" class="dz-picker" role="dialog" aria-label="파일 유형 선택">
-              <button class="dz-pick-btn" @click.stop="pickFromDz('docs')">📄 문서 선택</button>
-              <button class="dz-pick-btn" @click.stop="pickFromDz('images')">🖼 이미지 선택</button>
-              <button class="dz-pick-cancel" @click.stop="closeDzPicker">취소</button>
-            </div>
-            <div v-if="dzPickerOpen" class="dz-picker-mask" @click="closeDzPicker" />
-
-            <!-- 숨김 input -->
-            <input ref="fileInputDocs" type="file" style="display:none" multiple @change="onPicked" 
-              accept="application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,
-                      application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
-                      application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation" />
-            <input ref="fileInputImages" type="file" style="display:none" multiple accept="image/*" @change="onPicked" />
-          </div>
-
-          <!-- ✅ 첨부된 파일 목록 -->
-          <div v-if="uploadedFiles.length" class="sheet-files">
-            <div v-for="(file, index) in uploadedFiles" :key="index" class="sheet-file">
-              <div class="file-kind">{{ resolveEmoji(file.name) }}</div>
-              <div class="file-name" :title="file.name">{{ file.name }}</div>
-              <div class="file-size">{{ (file.size / 1024 / 1024).toFixed(2) }} MB</div>
-              <button class="file-remove" @click="removeFile(index)">삭제</button>
-            </div>
-          </div>
           <!-- 보험사 탭 & 기준 월 -->
           <section class="block">
             <div class="insurer-tabs" role="tablist" aria-label="보험사 선택">
               <button
                 v-for="b in brands"
                 :key="b"
-                class="insurer-tab hidden"
+                class="insurer-tab"
                 :class="{ active: form.brand === b }"
                 role="tab"
                 :aria-selected="form.brand === b"
@@ -69,13 +26,12 @@
               </button>
             </div>
 
-            <div class="grid2 mt8 hidden">
+            <div class="grid2 mt8">
               <div class="form-row">
                 <label class="label">선택된 보험사</label>
                 <input class="input" type="text" :value="form.brand" disabled />
               </div>
-            </div>
-            <div class="grid2 mt8">
+
               <div
                 class="form-row month-click"
                 role="button"
@@ -95,6 +51,8 @@
                   @change="onYearMonthChange"
                 />
               </div>
+            </div>
+            <div class="grid2 mt8">
               <div class="form-row">
                 <label class="label" for="baseDay">기준 일</label>
                 <input
@@ -140,7 +98,7 @@
           </section>
 
           <!-- 자동 계산 결과 -->
-          <section class="block hidden">
+          <section class="block">
             <div class="block-head">
               <h4 class="block-title">자동 계산 결과</h4>
             </div>
@@ -175,7 +133,7 @@
           </section>
 
           <!-- 보험사별 정책 — 브릿지 규칙 -->
-          <section class="block hidden">
+          <section class="block">
             <div class="block-head">
               <h4 class="block-title">보험사별 정책 — 브릿지 규칙</h4>
               <div class="row-actions">
@@ -218,7 +176,7 @@
           
 
           <!-- 기준월 주차 설정 -->
-          <section class="block hidden">
+          <section class="block">
             <div class="block-head">
               <h4 class="block-title">기준월 주차 설정(자동 생성됨 • 필요 시 수정)</h4>
               <div class="row-actions">
@@ -327,9 +285,6 @@ export default {
     const ymDefault = `${now.getFullYear()}-${pad2(now.getMonth()+1)}`;
     const today = `${now.getFullYear()}-${pad2(now.getMonth()+1)}-${pad2(now.getDate())}`;
     return {
-      uploadedFiles: [],
-      isOver: false,
-      dzPickerOpen: false,
       brands: ['현대','삼성','디비','KB','한화','흥국','롯데','메리츠','기타'],
       yearMonth: ymDefault,
       baseDay: today,
@@ -399,42 +354,6 @@ export default {
     this.ensureMonthPolicy(); 
   },
   methods:{
-    triggerPick(kind) {
-      if (kind === 'images') this.$refs.fileInputImages?.click();
-      else this.$refs.fileInputDocs?.click();
-    },
-    openDzPicker() { this.dzPickerOpen = true; },
-    closeDzPicker() { this.dzPickerOpen = false; },
-    pickFromDz(kind) { this.triggerPick(kind); this.closeDzPicker(); },
-    onDragEnter() { this.isOver = true; },
-    onDragOver() { this.isOver = true; },
-    onDragLeave() { this.isOver = false; },
-    onDrop(e) {
-      this.isOver = false;
-      const files = Array.from(e.dataTransfer.files || []);
-      this.addFiles(files);
-    },
-    onPicked(e) {
-      const files = Array.from(e.target.files || []);
-      this.addFiles(files);
-      e.target.value = '';
-    },
-    addFiles(files) {
-      const valid = files.filter(f => /\.(pdf|txt|docx?|xls|xlsx|pptx?|png|jpe?g)$/i.test(f.name));
-      if (!valid.length) return this.toast('지원하지 않는 파일 형식입니다.');
-      this.uploadedFiles.push(...valid);
-      this.toast(`${valid.length}개 파일 추가됨`);
-    },
-    resolveEmoji(name = "") {
-      const lower = name.toLowerCase();
-      if (lower.endsWith(".pdf")) return "📕";
-      if (lower.endsWith(".doc") || lower.endsWith(".docx")) return "📘";
-      if (lower.endsWith(".xls") || lower.endsWith(".xlsx")) return "📗";
-      if (/\.(png|jpg|jpeg|gif|webp|bmp)$/i.test(lower)) return "🖼";
-      if (lower.endsWith(".txt")) return "📄";
-      return "📎";
-    },
-    removeFile(i) { this.uploadedFiles.splice(i, 1); },
     fmt(n){ return Number(n||0).toLocaleString('ko-KR'); },
     toast(msg=''){ 
       this.toastMsg=msg; 
@@ -604,18 +523,7 @@ export default {
       const payload={ 
         category:`시상분석-${this.categorySuffix||'보험사정책'}`, 
         question:this.memo?.trim()||'보험사/기준월별 브릿지·주차 시상 자동계산 결과 요약을 요청합니다.', 
-        meta:{ 
-          //brand:this.form.brand,
-          yearMonth:this.yearMonth,
-          baseDay:this.baseDay,
-          //policy:this.policy,
-          //monthPolicy:this.monthPolicy,
-          input:{ 
-            augAmount:this.input.augAmount,
-            weeks:{...this.weekInputs} 
-          } 
-        }, 
-        files: this.uploadedFiles,
+        meta:{ brand:this.form.brand, yearMonth:this.yearMonth, baseDay:this.baseDay, policy:this.policy, monthPolicy:this.monthPolicy, input:{ augAmount:this.input.augAmount, weeks:{...this.weekInputs} } }, 
         result:this.derived,
         humanText:this.buildUserSummary()
       }; 
@@ -625,7 +533,7 @@ export default {
     // 사람이 읽기 좋은 요약
     buildUserSummary(){
       const lines = [];
-      //const { brand } = this.form;
+      const { brand } = this.form;
       const ym = this.yearMonth;
       const { prevM, prevStart, prevEnd } = this.calcPrevSpanRangeFromWeeks();
       const base = new Date(this.baseDay);
@@ -637,7 +545,7 @@ export default {
       const baseWeekLabel = baseWeek ? `${baseWeek.weekNo}주차` : "해당 없음";
       
       lines.push(`### 시상 시뮬레이션 요청`);
-      //lines.push(`- 보험사: **${brand}**`);
+      lines.push(`- 보험사: **${brand}**`);
       lines.push(`- 기준월: **${ym}**`);
       lines.push(`- 기준일: **${this.baseDay} (${baseWeekLabel})**`);
       lines.push(`- 전월 인정기간: **${prevM}/${String(prevStart).padStart(2,'0')}~${prevM}/${String(prevEnd).padStart(2,'0')}**`);
@@ -652,7 +560,6 @@ export default {
         lines.push(`- ${lbl}: ${this.fmt(val)}원`);
       }
       lines.push("");
-      /*
       const d = this.derived;
       lines.push(`**자동 계산 결과**`);
       lines.push(`- 기준월 실적 합계: **${this.fmt(d.septTotal)}원**`);
@@ -676,7 +583,6 @@ export default {
         );
       }
       lines.push("");
-      */
       if (this.memo?.trim()){
         lines.push(`> 메모: ${this.memo.trim()}`);
         lines.push("");
@@ -738,75 +644,6 @@ export default {
 }
 .input:focus{ border-color:#93C5FD; box-shadow:0 0 0 3px rgba(147,197,253,.35); }
 
-/* ========== 드롭존 스타일 ========== */
-.dropzone {
-  border: 2px dashed #94a3b8;
-  border-radius: 12px;
-  padding: 20px;
-  text-align: center;
-  background: #f8fafc;
-  margin-bottom: 12px;
-  position: relative;
-  transition: border-color .15s, background .15s;
-}
-.dropzone.over { border-color: #3b82f6; background: #eef6ff; }
-.dz-icon { font-size: 24px; margin-bottom: 6px; }
-.dz-title { font-weight: 800; color: #0f172a; }
-.dz-hint { font-size: 12px; color: #64748b; }
-
-
-/* 팝오버 */
-.dz-picker{
-  position: absolute; inset: 50% auto auto 50%;
-  transform: translate(-50%, -50%);
-  display: grid; gap: 8px;
-  min-width: 220px;
-  padding: 12px;
-  border: 1px solid #E5E7EB;
-  border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 12px 28px rgba(0,0,0,.14);
-  z-index: 3;
-  animation: dz-pop .16s ease-out;
-}
-.dz-picker-mask {
-  position: absolute; inset: 0;
-  background: rgba(0,0,0,.04);
-  z-index: 2;
-}
-.dz-pick-btn, .dz-pick-cancel{
-  padding: 10px 12px; border-radius: 10px;
-  border: 1px solid #E5E7EB; background:#fff; cursor:pointer; font-weight:700;
-}
-.dz-pick-btn:hover{ background:#F3F4F6; }
-.dz-pick-cancel{ color:#6B7280; }
-.dz-picker-mask{
-  position: absolute; inset: 0;
-  background: rgba(0,0,0,.04); /* 아주 옅은 마스크 */
-  z-index: 2;
-}
-@keyframes dz-pop{
-  from { transform: translate(-50%, -46%); opacity: .0; }
-  to   { transform: translate(-50%, -50%); opacity: 1; }
-}
-
-/* ========== 파일 리스트 ========== */
-.sheet-files { display: grid; gap: 8px; margin-bottom: 12px; }
-.sheet-file {
-  display: grid; grid-template-columns: 32px 1fr auto auto;
-  align-items: center; gap: 8px;
-  border: 1px solid #e5e7eb; border-radius: 10px;
-  background: #fff; padding: 8px;
-}
-.file-kind { text-align: center; }
-.file-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.file-size { font-size: 12px; color: #64748b; }
-.file-remove {
-  border: 1px solid #e5e7eb; background: #f9fafb; border-radius: 8px;
-  padding: 4px 8px; cursor: pointer;
-}
-.file-remove:hover { background: #f3f4f6; }
-
 /* 숫자 입력: 1,000,000(7자리) 맞춤 폭 */
 .input[type="number"]{ width:11ch; max-width:100%; text-align:right; font-variant-numeric: tabular-nums; -moz-appearance:textfield; }
 .input[type="number"]::-webkit-outer-spin-button, .input[type="number"]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
@@ -847,8 +684,5 @@ export default {
   max-width: 100%;
   text-align: right;
   font-variant-numeric: tabular-nums;
-}
-.hidden {
-  display: none;
 }
 </style>

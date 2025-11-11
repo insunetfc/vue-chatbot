@@ -454,8 +454,12 @@
     />
     <bonus-planner-sheet
       v-if="showBonusSheet"
+      :uploaded-files="uploadedFiles"
       :is-sending="isSending"
-      @close="showBonusSheet = false"
+      :file-emoji="fileEmoji"
+      :limits="{ maxFiles: LIMIT_MAX_FILES, perFile: LIMIT_PER_FILE, total: LIMIT_TOTAL }"
+      :valid-ext="/\.(pdf|txt|docx|png|jpe?g|xls|xlsx|ppt|pptx)$/i"
+      @close="showBonusSheet=false"
       @send="onBonusSend"
     />
     <EduMaterialSheet
@@ -1097,8 +1101,12 @@ export default {
       this.userInput = visible + hidden;
 
       // 부모의 category 분기 로직(예상수수료 → 시상분석 prefix)을 트리거
-      this.lastClickedChipTitle = "예상수수료";
-
+      this.lastClickedChipTitle = '예상수수료';
+      // 파일 업로드도 함께 전달
+      if (payload?.files?.length) {
+        this.uploadedFiles.push(...payload.files);
+      }
+    
       this.showBonusSheet = false;
       this.sendMessage();
     },

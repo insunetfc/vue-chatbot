@@ -18,12 +18,14 @@
     "@tiptap/vue-3": "^3.2.0",
     "core-js": "^3.8.3",
     "dompurify": "^3.2.6",
+    "flatpickr": "^4.6.13",
     "markdown-it": "^14.1.0",
     "markdown-it-multimd-table": "^4.2.3",
     "pdfjs-dist": "^3.11.174",
     "sortablejs": "^1.15.6",
     "tesseract.js": "^6.0.1",
     "vue": "^3.2.13",
+    "vue3-datepicker": "^0.4.0",
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {

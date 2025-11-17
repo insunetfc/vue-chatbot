@@ -863,7 +863,7 @@ export default {
       pendingBonusPayload: null,
 
       // 설정
-      API_BASE: "/api/v_1",
+      API_BASE: "http://15.165.60.45:5000",
       LIMIT_MAX_FILES: 3,
       LIMIT_PER_FILE: 50 * 1024 * 1024,
       LIMIT_TOTAL: 25 * 1024 * 1024,
@@ -2247,10 +2247,26 @@ export default {
 
         while (!done) {
           const { value, done: isDone } = await reader.read();
+          
           done = isDone;
+          console.log("🔥 [VUe RECEIVED CHUNK]", {
+            isDone,
+            decoded: value ? decoder.decode(value, { stream: true }) : null,
+            size: value?.length,
+            time: new Date().toISOString(),
+          });
+
           if (value) {
             const chunk = decoder.decode(value, { stream: true });
             botText += chunk;
+            
+            console.log(
+              "%c🟦 [DECODED CHUNK]",
+              "color: cyan; font-size:13px;",
+              chunk
+            );
+
+            
             this.messages.splice(botIndex, 1, {
               role: "bot",
               text: botText,
